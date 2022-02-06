@@ -11,32 +11,35 @@ Il générera aussi un dossier contenant toutes les images de couverture des ouv
 
 ### Téléchargement des fichiers depuis un dépôt distant dans le dossier "/Users/user_name/documents" :
 
-''' 
-- $ cd /Users/user_name/documents
-- $ git clone https://github.com/nicolasAniort/P2_aniort_nicolas.git custom_project_name
-- $ cd custom_project_name
-'''
+``` 
+ $ cd /Users/user_name/documents
+ 
+ $ git clone https://github.com/nicolasAniort/P2_aniort_nicolas.git custom_project_name
+ 
+ $ cd custom_project_name
+
+```
 ### Création d'un environnement virtuel nommé "env" :
-''' 
+``` 
 - $ python -m venv env
-'''
+```
 ### Activation de l'environnement :
-''
+```
 - $ source env/bin/activate # OSX 
 - $ source env/Scripts/activate # Windows
-''
+```
 ### Installation des packages nécessaire depuis le fichier "requirements.txt" :
-'' 
+```
 - $ pip install -r requirements.txt
-''
+```
 ## Utilisation :
 
 ### Exécution du script :
-''
+```
 - $ python scrap_book_final.py
-''
+```
 Le script va alors demander à l'utilisateur une URL à utiliser.
 
 Pour l'utiliser, si l'utilisateur appuie sur la touche "ENTER", le script utilisera une url d'exemple de livre :
 
-Please, insert the URL to scrape : https://books.toscrape.com/
+Entrez l'url à traiter : https://books.toscrape.com/
