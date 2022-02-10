@@ -9,7 +9,7 @@ Il générera aussi un dossier contenant toutes les images de couverture des ouv
 
 ## Installation :
 
-### Téléchargement des fichiers depuis un dépôt distant dans le dossier "/Users/user_name/documents" :
+### Téléchargement des fichiers depuis un dépôt distant dans le dossier de votre choix; nous choisirons "/Users/user_name/documents" :
 
 ``` 
  $ cd /Users/user_name/documents
@@ -24,8 +24,7 @@ Il générera aussi un dossier contenant toutes les images de couverture des ouv
 - $ python -m venv env
 ```
 ### Activation de l'environnement :
-```
-- $ source env/bin/activate # OSX 
+``` 
 - $ source env/Scripts/activate # Windows
 ```
 ### Installation des packages nécessaire depuis le fichier "requirements.txt" :
@@ -34,9 +33,14 @@ Il générera aussi un dossier contenant toutes les images de couverture des ouv
 ```
 ## Utilisation :
 
-### Exécution du script :
+### Exécution du script sous Windows:
 ```
-- $ python scrap_book_final.py
+- ouvrir un terminal en appuyant sur la combinaison de touche suivante: touche Windows + R
+- saisir 'cmd' et appuyer sur entrée
+le terminal s'ouvre.
+- saisir :'cd c:\chemin\total\du\dossier\contenant\le_script_a_executer'
+- lancer le script en saisissant :'py scrap_book_final.py'
+
 ```
 Le script va alors demander à l'utilisateur une URL à utiliser.
 
