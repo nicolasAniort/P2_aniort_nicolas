@@ -20,16 +20,12 @@ heure: str
 cpt_page: str
 cpt_categorie: int
 categories: str
-"""
-interface de recuperation durl
-"""
+""" interface de recuperation durl """
 def recuperation_url():
     url_rec = input('Entrez l\'url à traiter : ')
     extraction_des_categories(url_rec)
     return url_rec
-"""
-creation de l'horodatage
-"""
+""" creation de l'horodatage """
 def horodater():
 
     horodate = datetime.datetime.now()
@@ -39,25 +35,23 @@ def horodater():
 def extraction_des_categories(url):
 
     # lien de la page à scrapper
-    retour = requests.get(url)
-    page = retour.content
-    soup: BeautifulSoup = BeautifulSoup(page, 'html.parser')
+    soup = soupe(url)
     liste_categorie =  soup.find("ul", class_="nav nav-list").find('ul').find_all('a')
     nombrecategorie = len(liste_categorie)
-    a = 0
-    while a < (nombrecategorie):
-            heure = datetime.datetime.now()
-            print("numero de la catégorie traitée: " + str(a) + " pour " + str(nombrecategorie) + "au total. heure debut :" + str(heure.strftime("%H:%M:%S")))
-            url_de_categorie = url_prefixe + liste_categorie[a].get("href")
+    a = 1
+    if a != int(nombrecategorie) : 
+        for a in range(int(nombrecategorie)):
+            url_de_categorie = url_prefixe + liste_categorie[a - 1].get("href")
             extraction_de_page(url_de_categorie)
             a = a + 1
+    else:
+        exit()
 
 def extraction_de_page(url_page):
+    
     # lien de la page à scrapper
-    retour = requests.get(url_page)
-    page_cat = retour.content
     # transforme (parse) le HTML en objet BeautifulSoup
-    soup_cat: BeautifulSoup = BeautifulSoup(page_cat, 'html.parser')
+    soup_cat = soupe(url_page)
     compteur_de_page(soup_cat, url_page)
 
     return url_page
@@ -79,24 +73,18 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
         """
         for p in range(1, int(nombrepagenum) + 1):
 
-            reponse = requests.get(url_rec.replace("index.html", "page-" + str(p) + ".html"))
-            page_cat = reponse.content
-            soup_cat: BeautifulSoup = BeautifulSoup(page_cat, 'html.parser')
-            #soup_list_article = soup_cat.find("article", class_="product_pod")
+            soup_cat = soupe(url_rec.replace("index.html", "page-" + str(p) + ".html"))
             soup_list_a_brute = soup_cat.find("article", class_="product_pod").find_all_next('a')
-            #soup_list_a_brute = soup_list_article.find_all_next('a')
-            if p == 1:
-                if len(soup_list_a_brute) == 41:
-                    del soup_list_a_brute[40]
+            
+            if p == 1 and len(soup_list_a_brute) == 41:
+                del soup_list_a_brute[40]
                 nombredeligne_brute: int = len(soup_list_a_brute)
                 soup_list_cumul = soup_list_a_brute
-            else:
-                if len(soup_list_a_brute) == 41:
-                    del soup_list_a_brute[40]
+            elif len(soup_list_a_brute) == 41: 
+                del soup_list_a_brute[40]
                 nombredeligne_brute = nombredeligne_brute + len(soup_list_a_brute)
-                for a in range(0, (len(soup_list_a_brute) - 1)):
+            for a in range(0, (len(soup_list_a_brute) - 1)):
                     soup_list_cumul.append(soup_list_a_brute[a])
-
         """
         bloc de recuperation des url relatives de livres
         """
@@ -105,11 +93,7 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
                 balise_a = soup_list_cumul[i]
                 attribut_href = balise_a['href']
                 soup_list_.append(str(attribut_href))
-            """elif i % 2 == 0:
-                balise_a = soup_list_cumul[i]
-                attribut_href = balise_a['href']
-                soup_list_.append(str(attribut_href))"""
-
+            
         """ boucles de recuperation de la liste de livres et des information des livres"""
         nombredeligne: int = len(soup_list_)
 
@@ -122,34 +106,19 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
                 categories = categorie
                 # creation de l\'url du livre
                 cleaner_url_livre: str = soup_list_[j]
-                #if cleaner_url_livre == "page-1.html" or cleaner_url_livre == "page-2.html" or cleaner_url_livre == "page-3.html" or cleaner_url_livre == "page-4.html" or cleaner_url_livre == "page-5.html" or cleaner_url_livre.:
                 if "page-" in cleaner_url_livre:
                     j = j + 1
                     continue
                 product_page_urls = cleaner_url_livre.replace('../../..', str(url_prefix_livre))
-                reponse = requests.get(product_page_urls)
-                page_cat = reponse.content
                 # transforme (parse) le HTML en objet BeautifulSoup
-                soup = BeautifulSoup(page_cat, 'html.parser')
+                soup = soupe(product_page_urls)
                 # appel de la definition d'extraction des informations du livre
                 information_livre = []
                 information_livre = etl(product_page_urls, soup)
-                """upc = information_livre[1]
-                title = information_livre[2]
-                price_including_tax = information_livre[3]
-                price_excluding_tax = information_livre[4]
-                number_available = information_livre[5]
-                product_description = information_livre[6]
-                category = information_livre[7]
-                review_rating = information_livre[8]
-                image_url = information_livre[9]"""
                 # construction des lignes par livre
-                """infos_livre_categorie.append([categories, product_page_urls, upc, title, price_including_tax,
-                                              price_excluding_tax, number_available, product_description, category,
-                                              review_rating, image_url])"""
                 infos_livre_categorie.append([categories, product_page_urls, information_livre[1], information_livre[2], information_livre[3],
                                               information_livre[4], information_livre[5], information_livre[6], information_livre[7],
-                                              information_livre[8], information_livre[9]])
+                                              information_livre[8], information_livre[9]])                
         # construction de l'entete
         en_tete = ["categories", "urls", "upcs", "titre", "prix TTC", "prix HT", "nombre de livres disponibles",
                    "description",
@@ -158,16 +127,12 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
         compt = int(len(infos_livre_categorie))
         charger_donnees("donnees_categorie_" + "-" + information_livre[7] + "-" + horodater() + ".csv", en_tete, compt,
                         infos_livre_categorie)
-
     else:
         """ 
         Bloc de traitement des page livre s'il n'y a qu'une page dans la catégorie """
-        reponse = requests.get(url_rec)
-        page_cat = reponse.content
         # transforme (parse) le HTML en objet BeautifulSoup
-        soup_cat: BeautifulSoup = BeautifulSoup(page_cat, 'html.parser')
+        soup_cat = soupe(url_rec)
         # recuperation d'un objet soup contenant les <a> de la categorie product_pod
-        # soup_list_article = soup_cat.find("article", class_="product_pod")
         soup_list_a_brute = soup_cat.find("article", class_="product_pod").find_all_next('a')
         nombredeligne_brute: int = len(soup_list_a_brute)
 
@@ -178,12 +143,7 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
                 balise_a = soup_list_a_brute[i]
                 attribut_href = balise_a['href']
                 soup_list_.append(str(attribut_href))
-            """elif i % 2 == 0:
-
-                balise_a = soup_list_a_brute[i]
-                attribut_href = balise_a['href']
-                soup_list_.append(str(attribut_href))"""
-
+            
         nombredeligne = len(soup_list_)
 
         for j in range(0, nombredeligne):
@@ -195,21 +155,10 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
                 # url du livre
                 cleaner_url_livre: str = soup_list_[j]
                 product_page_urls = cleaner_url_livre.replace('../../..', str(url_prefix_livre))
-                reponse = requests.get(product_page_urls)
-                page_cat = reponse.content
                 # transforme (parse) le HTML en objet BeautifulSoup
-                soup = BeautifulSoup(page_cat, 'html.parser')
+                soup = soupe(product_page_urls)
                 information_livre = []
                 information_livre = etl(product_page_urls, soup)
-                """upc = information_livre[1]
-                title = information_livre[2]
-                price_including_tax = information_livre[3]
-                price_excluding_tax = information_livre[4]
-                number_available = information_livre[5]
-                product_description = information_livre[6]
-                category = information_livre[7]
-                review_rating = information_livre[8]
-                image_url = information_livre[9]"""
                 # construction des lignes par livre
                 infos_livre_categorie.append([categories, product_page_urls, information_livre[1], information_livre[2], information_livre[3],
                                               information_livre[4], information_livre[5], information_livre[6], information_livre[7],
@@ -223,10 +172,11 @@ def extractionlistelivre(nombrepagenum: int, soup_cat, url_rec: str):
         # Génération du fichier csv
         charger_donnees("donnees_categorie_" + "-" + information_livre[7] + "-" + horodater() + ".csv", en_tete, compt,
                         infos_livre_categorie)
+       
 
 
 def compteur_de_page(soup_cat: BeautifulSoup, url_page):
-
+    
     """
     charger les données dans un fichier csv
     Si la classe pager existe, il y a plusieurs pages, on va donc
@@ -243,8 +193,10 @@ def compteur_de_page(soup_cat: BeautifulSoup, url_page):
     else:
         nbpagenum = 1
         extractionlistelivre(nbpagenum, soup_cat, url_page)
+    
 
 def charger_donnees(nom_fichier, en_tete, compt, infos_livre_categorie):
+    
     """
     On crée un fichier, on cree les entetes, et on alimente les colonnes lignes par lignes"""
     with open(nom_fichier, 'w', newline='', encoding='utf-8') as fichier_csv:
@@ -267,7 +219,6 @@ def charger_donnees(nom_fichier, en_tete, compt, infos_livre_categorie):
 
 #recuperation des infos d'un livre
 def etl(url,soup):
-
     # transforme (parse) le HTML en objet BeautifulSoup
     soup = soup
     # récupération de L'url de la page du produit
@@ -347,8 +298,13 @@ def etl(url,soup):
     urllib.request.urlretrieve(image_url, file_img_libre)
 
     infos_livre = [product_page_urls, upc, title, price_including_tax, price_excluding_tax, number_available, product_description, category, review_rating, image_url]
-
     return infos_livre
+
+def soupe(url):
+    retour = requests.get(url)
+    page = retour.content
+    soup: BeautifulSoup = BeautifulSoup(page, 'html.parser')
+    return soup
 
 """
 creation d'un objet soup à partir de lurl saisie renvoi de l'objet à la def compteur_de_page
